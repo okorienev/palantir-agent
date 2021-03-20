@@ -1,0 +1,16 @@
+[package]
+name    = "palantir-agent"
+version = "0.1.0"
+authors = ["Oleksandr Korienev <alexkorienev@gmail.com>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+palantir-types = { git = "ssh://git@github.com/AlexPraefectus/palantir-types.git", branch = "master"}
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "histogram"
+harness = false
