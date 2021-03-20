@@ -8,8 +8,17 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 palantir-types = { git = "ssh://git@github.com/AlexPraefectus/palantir-types.git", branch = "master"}
 
+[lib]
+name="palantir_agent_lib"
+path="src/lib/mod.rs"
+
+[[bin]]
+name="palantir_agent_bin"
+path="src/bin/main.rs"
+
 [dev-dependencies]
 criterion = "0.3"
+rand = "0.8.3"
 
 [[bench]]
 name = "histogram"

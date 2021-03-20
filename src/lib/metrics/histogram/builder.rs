@@ -1,5 +1,5 @@
-use crate::lib::metrics::histogram::metric::Histogram;
-use crate::lib::metrics::tag::Tag;
+use crate::metrics::histogram::metric::Histogram;
+use crate::metrics::tag::Tag;
 
 pub struct HistogramBuilder {
     name: String,

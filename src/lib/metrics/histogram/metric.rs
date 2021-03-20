@@ -1,5 +1,5 @@
-use crate::lib::metrics::tag::Tag;
-use crate::lib::metrics::traits::PrometheusMetric;
+use crate::metrics::tag::Tag;
+use crate::metrics::traits::PrometheusMetric;
 
 const E2_MIN: usize = 8;
 const E2_MAX: usize = 36;
@@ -169,9 +169,9 @@ impl PrometheusMetric for Histogram {
 
 #[cfg(test)]
 mod tests {
-    use crate::lib::metrics::histogram::metric::{get_vmrange, Histogram, BUCKETS_COUNT};
-    use crate::lib::metrics::tag::Tag;
-    use crate::lib::metrics::traits::PrometheusMetric;
+    use crate::metrics::histogram::metric::{get_vmrange, Histogram, BUCKETS_COUNT};
+    use crate::metrics::tag::Tag;
+    use crate::metrics::traits::PrometheusMetric;
 
     #[test]
     fn test_vmrange_min() {
