@@ -7,6 +7,12 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 palantir-types = { git = "ssh://git@github.com/AlexPraefectus/palantir-types.git", branch = "master"}
+serde_yaml="0.8.17"
+serde = { version = "1.0.124", features = ["derive"] }
+
+[dev-dependencies]
+criterion = "0.3"
+rand = "0.8.3"
 
 [lib]
 name="palantir_agent_lib"
@@ -14,11 +20,7 @@ path="src/lib/mod.rs"
 
 [[bin]]
 name="palantir_agent_bin"
-path="src/bin/main.rs"
-
-[dev-dependencies]
-criterion = "0.3"
-rand = "0.8.3"
+path= "src/bin/agent.rs"
 
 [[bench]]
 name = "histogram"
