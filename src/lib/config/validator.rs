@@ -1,6 +1,6 @@
 use crate::config::defs::{Config, ListenerType};
-use std::collections::HashSet;
 use crate::config::parser::LogicError;
+use std::collections::HashSet;
 
 /// checks that no port is used twice
 fn listeners_no_same_ports(listeners_config: &Vec<ListenerType>) -> Result<(), LogicError> {
@@ -41,12 +41,11 @@ pub fn run_validation_chain(config: &Config) -> Result<(), LogicError> {
     Ok(())
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::config::defs::{Config, ListenerType, UDPConfig, TCPConfig};
-    use crate::config::validator::run_validation_chain;
+    use crate::config::defs::{Config, ListenerType, TCPConfig, UDPConfig};
     use crate::config::parser::LogicError;
+    use crate::config::validator::run_validation_chain;
 
     #[test]
     fn test_no_listeners_invalid() {
@@ -55,8 +54,10 @@ mod tests {
         let result = run_validation_chain(&config).err().unwrap();
 
         match result {
-            LogicError::PortUsedTwice(_) => { panic!("wrong error") }
-            LogicError::AtLeastOneListener => ()
+            LogicError::PortUsedTwice(_) => {
+                panic!("wrong error")
+            }
+            LogicError::AtLeastOneListener => (),
         }
     }
 
@@ -78,8 +79,12 @@ mod tests {
         let result = run_validation_chain(&config).err().unwrap();
 
         match result {
-            LogicError::PortUsedTwice(port) => { assert_eq!(port, 2746) }
-            LogicError::AtLeastOneListener => { panic!("wrong error") }
+            LogicError::PortUsedTwice(port) => {
+                assert_eq!(port, 2746)
+            }
+            LogicError::AtLeastOneListener => {
+                panic!("wrong error")
+            }
         }
     }
 
