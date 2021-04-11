@@ -7,8 +7,11 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 palantir-types = { git = "ssh://git@github.com/AlexPraefectus/palantir-types.git", branch = "master"}
+palantir-proto = { git = "ssh://git@github.com/AlexPraefectus/palantir-proto.git", branch = "master"}
 serde_yaml="0.8.17"
 serde = { version = "1.0.124", features = ["derive"] }
+log="0.4.14"
+simple_logger="1.11.0"
 
 [dev-dependencies]
 criterion = "0.3"
@@ -25,3 +28,7 @@ path= "src/bin/agent.rs"
 [[bench]]
 name = "histogram"
 harness = false
+
+[[example]]
+name = "client"
+path = "examples/client.rs"
