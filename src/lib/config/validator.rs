@@ -43,13 +43,17 @@ pub fn run_validation_chain(config: &Config) -> Result<(), LogicError> {
 
 #[cfg(test)]
 mod tests {
-    use crate::config::defs::{Config, ListenerType, TCPConfig, UDPConfig};
+    use crate::config::defs::{Config, ListenerType, TCPConfig, UDPConfig, RouterConfig};
     use crate::config::parser::LogicError;
     use crate::config::validator::run_validation_chain;
 
     #[test]
     fn test_no_listeners_invalid() {
-        let config = Config { listeners: vec![] };
+        let config = Config { 
+            listeners: vec![],             
+            router: RouterConfig {
+                inactivity_delay_ms: 10,
+            } };
 
         let result = run_validation_chain(&config).err().unwrap();
 
@@ -74,6 +78,9 @@ mod tests {
                     buffer_size: 4096,
                 }),
             ],
+            router: RouterConfig {
+                inactivity_delay_ms: 10,
+            }
         };
 
         let result = run_validation_chain(&config).err().unwrap();
@@ -101,6 +108,9 @@ mod tests {
                     buffer_size: 4096,
                 }),
             ],
+            router: RouterConfig {
+                inactivity_delay_ms: 10,
+            }
         };
 
         let result = run_validation_chain(&config).ok().unwrap();

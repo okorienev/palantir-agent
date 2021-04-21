@@ -2,20 +2,22 @@ use crate::config::defs::ListenerType;
 use listeners::udp::UDPListener;
 use log::info;
 use palantir_proto::palantir::request::Request;
+use palantir_proto::palantir::request::request::Message as ProtoMessage;
 use std::io::Result as IOResult;
 use std::sync::mpsc::Sender;
 use std::thread;
 use std::thread::JoinHandle;
 
 mod listeners;
+pub mod router;
 
 pub struct Server {
     listeners: Vec<ListenerType>,
-    tx: Sender<Request>,
+    tx: Sender<ProtoMessage>,
 }
 
 impl Server {
-    pub fn new(listeners: Vec<ListenerType>, tx: Sender<Request>) -> Self {
+    pub fn new(listeners: Vec<ListenerType>, tx: Sender<ProtoMessage>) -> Self {
         return Self { listeners, tx };
     }
 

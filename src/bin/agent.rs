@@ -1,5 +1,5 @@
 use log::{info, LevelFilter};
-use palantir_agent_lib::config::defs::{Config, ListenerType, UDPConfig};
+use palantir_agent_lib::config::defs::{Config, ListenerType, UDPConfig, RouterConfig};
 use palantir_agent_lib::metrics::histogram::builder::HistogramBuilder;
 use palantir_agent_lib::metrics::traits::PrometheusMetric;
 use palantir_agent_lib::workers::server::Server;
@@ -24,6 +24,9 @@ fn main() {
                 buffer_size: 4096,
             }),
         ],
+        router: RouterConfig {
+            inactivity_delay_ms: 10,
+        }
     };
 
     let (tx, rx) = channel();

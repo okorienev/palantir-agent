@@ -38,7 +38,7 @@ fn parse_config<T: AsRef<str>>(raw_config: T) -> Result<Config, ConfigurationErr
 
 #[cfg(test)]
 mod tests {
-    use crate::config::defs::{Config, ListenerType, TCPConfig, UDPConfig};
+    use crate::config::defs::{Config, ListenerType, TCPConfig, UDPConfig, RouterConfig};
     use crate::config::parser::{parse_config, ConfigurationError, LogicError};
     use serde_yaml::Error;
 
@@ -69,6 +69,9 @@ mod tests {
                     buffer_size: 4096,
                 }),
             ],
+            router: RouterConfig {
+                inactivity_delay_ms: 10,
+            }
         };
         let yaml = "
 ---
@@ -78,6 +81,8 @@ listeners:
       buffer_size: 4096
   - TCP:
       port: 2747
+router:
+  inactivity_delay_ms: 10
         ";
         let result = parse_config(yaml).ok().unwrap();
 
