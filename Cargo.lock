@@ -489,6 +489,7 @@ name = "palantir-agent"
 version = "0.1.0"
 dependencies = [
  "criterion",
+ "itertools 0.10.0",
  "log",
  "palantir-proto",
  "palantir-types",
