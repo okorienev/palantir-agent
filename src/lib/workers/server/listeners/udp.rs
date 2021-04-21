@@ -4,7 +4,6 @@ use palantir_proto::palantir::request::request::Message as ProtoMessage;
 use palantir_proto::palantir::request::Request;
 use palantir_proto::prost::bytes::BytesMut;
 use palantir_proto::prost::Message;
-use std::error::Error;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, UdpSocket};
 use std::sync::mpsc::Sender;
 use std::thread;

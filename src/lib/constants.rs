@@ -6,3 +6,5 @@ pub const ACTION_NAME_TAG_NAME: &str = "palantir_action_name";
 pub const ACTION_SPAN_TAG_NAME: &str = "palantir_span";
 
 pub const ACTION_METRIC_NAME: &str = "palantir_apm";
+pub const UNTRACKED_ACTION_KIND_NAME: &str = "palantir_untracked";
+pub const TOTAL_ACTION_KIND_NAME: &str = "palantir_total";

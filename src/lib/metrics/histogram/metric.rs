@@ -98,15 +98,7 @@ impl Histogram {
     /// Track value  
     /// Histogram resets at integer overflow with generation bump
     /// because counters should better be monotonic
-    #[inline(always)]
     pub fn track(&mut self, value: u64) {
-        self.track_n_hits(value, 1);
-    }
-
-    /// Track <hits> values which totally took <value> time  
-    /// Histogram resets at integer overflow with generation bump
-    /// because counters should better be monotonic
-    pub fn track_n_hits(&mut self, value: u64, hits: usize) {
         let bucket_no = get_bucket_no(value);
         let result_bucket = self.buckets[bucket_no].checked_add(value);
         let result_sum = self.sum.checked_add(value);
@@ -118,7 +110,7 @@ impl Histogram {
                 should_reset = false;
                 self.buckets[bucket_no] = result_bucket;
                 self.sum = result_sum;
-                self.count += hits as u64;
+                self.count += 1;
             }
         }
 

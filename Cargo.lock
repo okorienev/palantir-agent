@@ -414,7 +414,7 @@ dependencies = [
 [[package]]
 name = "palantir-proto"
 version = "0.1.0"
-source = "git+ssh://git@github.com/AlexPraefectus/palantir-proto.git?branch=master#07b2416bff9648f1dd4bca2787a4bd63f0142834"
+source = "git+ssh://git@github.com/AlexPraefectus/palantir-proto.git?branch=master#9fdbdd12193d8bc7ca2b999359cad8459019a51a"
 dependencies = [
  "prost",
  "prost-build",

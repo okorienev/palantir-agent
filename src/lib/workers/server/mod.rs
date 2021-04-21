@@ -1,8 +1,6 @@
 use crate::config::defs::ListenerType;
 use listeners::udp::UDPListener;
-use log::info;
 use palantir_proto::palantir::request::request::Message as ProtoMessage;
-use palantir_proto::palantir::request::Request;
 use std::io::Result as IOResult;
 use std::sync::mpsc::Sender;
 use std::thread;

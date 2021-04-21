@@ -1,9 +1,7 @@
 use crate::metrics::histogram::metric::Histogram;
-use crate::metrics::tag::Tag;
 use crate::util::checksum::Checksum;
 use crate::workers::registry::hc::HistogramCollection;
 use log::{error, trace};
-use palantir_proto::palantir::apm::v1::action::ApmV1Action;
 use palantir_proto::palantir::request::request::Message as ProtoMessage;
 use std::collections::HashMap;
 use std::sync::mpsc::Receiver;
@@ -31,7 +29,7 @@ impl APMRegistry {
                     trace!("message received by registry");
                     let now = Instant::now();
                     let checksum = msg.checksum();
-                    let mut hc = self
+                    let hc = self
                         .client_metrics
                         .entry(checksum)
                         .or_insert(HistogramCollection::from(&msg));

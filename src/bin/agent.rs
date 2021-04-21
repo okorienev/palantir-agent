@@ -1,13 +1,10 @@
-use log::{info, LevelFilter};
+use log::LevelFilter;
 use palantir_agent_lib::config::defs::{Config, ListenerType, UDPConfig};
-use palantir_agent_lib::metrics::histogram::builder::HistogramBuilder;
-use palantir_agent_lib::metrics::traits::PrometheusMetric;
 use palantir_agent_lib::workers::registry::apm::APMRegistry;
 use palantir_agent_lib::workers::server::Server;
 use simple_logger::SimpleLogger;
 use std::sync::mpsc::channel;
 use std::thread;
-use std::time::Duration;
 
 fn main() {
     SimpleLogger::new()
