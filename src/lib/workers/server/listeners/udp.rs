@@ -1,5 +1,6 @@
 use crate::config::defs::UDPConfig;
 use log::{error, info, trace, warn};
+use palantir_proto::palantir::request::request::Message as ProtoMessage;
 use palantir_proto::palantir::request::Request;
 use palantir_proto::prost::bytes::BytesMut;
 use palantir_proto::prost::Message;
@@ -11,13 +12,13 @@ use std::thread;
 pub struct UDPListener {
     socket: UdpSocket,
     buffer_size: usize,
-    tx: Sender<Request>,
+    tx: Sender<ProtoMessage>,
 }
 
 impl UDPListener {
     /// Ok  -> successfully bound to socket
     /// Err -> was unable to bind to socket
-    pub fn new(config: &UDPConfig, tx: Sender<Request>) -> std::io::Result<Self> {
+    pub fn new(config: &UDPConfig, tx: Sender<ProtoMessage>) -> std::io::Result<Self> {
         let socket = UdpSocket::bind(SocketAddr::new(
             IpAddr::from(Ipv4Addr::new(127, 0, 0, 1)),
             config.port,
@@ -53,14 +54,21 @@ impl UDPListener {
                     buf.resize(bytes_read, 0);
                     match Request::decode(buf) {
                         Ok(request) => {
-                            match self.tx.send(request) {
-                                Ok(_) => trace!("Message sent to channel"),
-                                Err(_) => {
-                                    error!("Message can't be sent to channel");
-                                    // we are unable to operate normally with dropped receiver
-                                    // and there is also no way to re-init whole data pipeline
-                                    // TODO introduce mechanism of re-creating data pipeline
-                                    std::process::exit(1);
+                            match request.message {
+                                Some(msg) => {
+                                    match self.tx.send(msg) {
+                                        Ok(_) => trace!("Message sent to channel"),
+                                        Err(_) => {
+                                            error!("Message can't be sent to channel");
+                                            // we are unable to operate normally with dropped receiver
+                                            // and there is also no way to re-init whole data pipeline
+                                            // TODO introduce mechanism of re-creating data pipeline
+                                            std::process::exit(1);
+                                        }
+                                    }
+                                }
+                                None => {
+                                    warn!("got empty message")
                                 }
                             }
                         }

@@ -6,7 +6,6 @@ edition = "2018"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-palantir-types = { git = "ssh://git@github.com/AlexPraefectus/palantir-types.git", branch = "master"}
 palantir-proto = { git = "ssh://git@github.com/AlexPraefectus/palantir-proto.git", branch = "master"}
 serde_yaml="0.8.17"
 serde = { version = "1.0.124", features = ["derive"] }

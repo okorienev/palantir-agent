@@ -1,6 +1,7 @@
 use palantir_proto::palantir::apm::v1::action::ApmV1Action;
 use palantir_proto::palantir::request::request::Message;
 use palantir_proto::palantir::request::Request;
+use palantir_proto::palantir::shared::measurement::Measurement as ProtoMeasurement;
 use palantir_proto::prost::bytes::BytesMut;
 use palantir_proto::prost::Message as ProstMessage;
 use std::net::UdpSocket;
@@ -21,7 +22,63 @@ fn main() {
             action_name: "controllers.example".to_string(),
             total_us: 55_000_000u64,
             additional_dimensions: vec![],
-            measurements: vec![],
+            measurements: vec![
+                ProtoMeasurement {
+                    name: "posgres".to_string(),
+                    total_us: 3_692,
+                    hits: 1,
+                },
+                ProtoMeasurement {
+                    name: "posgres".to_string(),
+                    total_us: 10_512,
+                    hits: 1,
+                },
+                ProtoMeasurement {
+                    name: "posgres".to_string(),
+                    total_us: 4_781,
+                    hits: 1,
+                },
+                ProtoMeasurement {
+                    name: "posgres".to_string(),
+                    total_us: 21_309,
+                    hits: 1,
+                },
+                ProtoMeasurement {
+                    name: "redis".to_string(),
+                    total_us: 891,
+                    hits: 1,
+                },
+                ProtoMeasurement {
+                    name: "redis".to_string(),
+                    total_us: 1_293,
+                    hits: 1,
+                },
+                ProtoMeasurement {
+                    name: "redis".to_string(),
+                    total_us: 2_341,
+                    hits: 1,
+                },
+                ProtoMeasurement {
+                    name: "redis".to_string(),
+                    total_us: 914,
+                    hits: 1,
+                },
+                ProtoMeasurement {
+                    name: "redis".to_string(),
+                    total_us: 5_712,
+                    hits: 1,
+                },
+                ProtoMeasurement {
+                    name: "redis".to_string(),
+                    total_us: 692,
+                    hits: 1,
+                },
+                ProtoMeasurement {
+                    name: "redis".to_string(),
+                    total_us: 1_039,
+                    hits: 1,
+                },
+            ],
         })),
     };
 

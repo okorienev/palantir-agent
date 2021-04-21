@@ -1,7 +1,6 @@
 use palantir_proto::palantir::apm::v1::action::ApmV1Action;
 use palantir_proto::palantir::request::request::Message as ProtoMessage;
 use palantir_proto::palantir::shared::tag::Tag;
-use std::cmp::Ordering;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hasher;
 
@@ -54,6 +53,14 @@ impl Checksum for ApmV1Action {
         hasher.write(self.action_name.as_bytes());
         hasher.write_u64(self.additional_dimensions.checksum());
 
+        hasher.finish()
+    }
+}
+
+impl Checksum for String {
+    fn checksum(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        hasher.write(self.as_bytes());
         hasher.finish()
     }
 }

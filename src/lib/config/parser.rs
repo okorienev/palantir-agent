@@ -1,8 +1,7 @@
-use super::defs::{Config, ListenerType};
+use super::defs::Config;
 use super::validator::run_validation_chain;
 use serde_yaml;
 use serde_yaml::Error;
-use std::collections::HashSet;
 use std::convert::From;
 
 #[derive(Debug)]
@@ -39,8 +38,7 @@ fn parse_config<T: AsRef<str>>(raw_config: T) -> Result<Config, ConfigurationErr
 #[cfg(test)]
 mod tests {
     use crate::config::defs::{Config, ListenerType, TCPConfig, UDPConfig};
-    use crate::config::parser::{parse_config, ConfigurationError, LogicError};
-    use serde_yaml::Error;
+    use crate::config::parser::{parse_config, ConfigurationError};
 
     #[test]
     fn test_parse_invalid_yaml() {
@@ -49,7 +47,7 @@ mod tests {
         let result = parse_config(yaml).err().unwrap();
 
         match result {
-            ConfigurationError::Parse(err) => (),
+            ConfigurationError::Parse(_) => (),
             ConfigurationError::Logic(_) => {
                 panic!("Wrong error")
             }
