@@ -1,51 +1,36 @@
 use crate::metrics::histogram::metric::Histogram;
-use crate::util::checksum::Checksum;
 use crate::workers::registry::hc::HistogramCollection;
 use log::{error, trace};
 use palantir_proto::palantir::request::request::Message as ProtoMessage;
 use std::collections::HashMap;
-use std::sync::mpsc::Receiver;
-use std::time::Instant;
+use std::sync::mpsc::{Receiver, channel};
+use std::time::{Instant, Duration};
+use std::sync::{Arc, Mutex};
+use std::thread;
+use crate::workers::registry::processor::Processor;
 
-pub struct APMRegistry {
-    rx: Receiver<ProtoMessage>,
-    client_metrics: HashMap<u64, HistogramCollection>,
-    handle_time: Histogram,
-}
+pub fn run_registry(rx: Receiver<ProtoMessage>) -> thread::Result<()> {
+    let client_metrics: Arc<Mutex<HashMap<u64, HistogramCollection>>> = Arc::new(Mutex::new(HashMap::new()));
+    let handle_time: Arc<Mutex<Histogram>> = Arc::new(Mutex::new(Histogram::new("request_handle_time".to_string(), Vec::new())));
 
-impl APMRegistry {
-    pub fn new(rx: Receiver<ProtoMessage>) -> Self {
-        Self {
+    let (reporter_tx, reporter_rx) = channel();
+    let processor_handle =  thread::spawn(move || {
+        let mut processor = Processor::new(
             rx,
-            client_metrics: HashMap::new(),
-            handle_time: Histogram::new("request_handle_time".to_string(), Vec::new()),
-        }
-    }
+            client_metrics.clone(),
+            handle_time.clone(),
+                reporter_rx,
+            );
+            processor.run();
+        });
 
-    pub fn run(&mut self) {
-        loop {
-            match self.rx.recv() {
-                Ok(msg) => {
-                    trace!("message received by registry");
-                    let now = Instant::now();
-                    let checksum = msg.checksum();
-                    let hc = self
-                        .client_metrics
-                        .entry(checksum)
-                        .or_insert(HistogramCollection::from(&msg));
-                    hc.process(msg);
-                    let elapsed = now.elapsed();
-                    trace!("processing took {} us", elapsed.as_micros());
-                    self.handle_time.track(elapsed.as_micros() as u64);
-                }
-                Err(_) => {
-                    error!("Message can't be read from channel");
-                    // we are unable to operate normally with dropped receiver
-                    // and there is also no way to re-init whole data pipeline
-                    // TODO introduce mechanism of re-creating data pipeline
-                    std::process::exit(1);
-                }
-            }
-        }
-    }
+        let reporter_handle = thread::spawn(move || {
+            let tx = reporter_tx;
+            thread::sleep(Duration::from_secs(10));
+        });
+
+        processor_handle.join()?;
+        reporter_handle.join()?;
+
+        Ok(())
 }

@@ -1,6 +1,6 @@
 use log::LevelFilter;
 use palantir_agent_lib::config::defs::{Config, ListenerType, UDPConfig};
-use palantir_agent_lib::workers::registry::apm::APMRegistry;
+use palantir_agent_lib::workers::registry::apm::run_registry;
 use palantir_agent_lib::workers::server::Server;
 use simple_logger::SimpleLogger;
 use std::sync::mpsc::channel;
@@ -29,9 +29,8 @@ fn main() {
     let server = Server::new(config.listeners, tx);
     let listener_handles = server.schedule().unwrap();
 
-    let mut registry = APMRegistry::new(rx);
     let registry_handler = thread::spawn(move || {
-        registry.run();
+       run_registry(rx);
     });
 
     for join_handle in listener_handles {
