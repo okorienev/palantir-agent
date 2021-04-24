@@ -1,0 +1,15 @@
+shell: bash
+
+env: {}
+eval_env: {}
+
+commands:
+  vm:
+    cmd: |
+      mkdir -p .volumes
+      docker run \
+        -p "127.0.0.1:8428:8428/tcp" \
+        -v "/$(pwd)/.volumes/victoriametrics:/etc/victoriametrics" \
+        victoriametrics/victoria-metrics \
+        --httpListenAddr=:8428 \
+        --storageDataPath=/etc/victoriametrics
