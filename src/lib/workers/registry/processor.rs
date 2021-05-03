@@ -9,23 +9,7 @@ use std::error::Error;
 use std::time::Instant;
 use log::{error, trace};
 use std::any::Any;
-
-pub enum ProcessError {
-    Disconnected,
-    LockPoisoned,
-}
-
-impl From<PoisonError<()>> for ProcessError {
-    fn from(_: PoisonError<()>) -> Self {
-        return Self::LockPoisoned
-    }
-}
-
-impl From<RecvError> for ProcessError {
-    fn from(_: RecvError) -> Self {
-        return Self::Disconnected
-    }
-}
+use crate::workers::registry::error::RegistryError;
 
 pub struct Processor {
     rx: Receiver<ProtoMessage>,
@@ -45,19 +29,19 @@ impl Processor {
         Self {rx, client_metrics, handle_time, keepalive_reporter}
     }
 
-    pub fn run(&mut self) -> Result<(), ProcessError<>> {
+    pub fn run(&mut self) -> Result<(), RegistryError<>> {
         loop {
             let reporter_alive = self.keepalive_reporter.try_recv();
             if let Err(TryRecvError::Disconnected) = reporter_alive {
                 error!("Reporter panicked, exiting");
-                return Err(ProcessError::Disconnected)
+                return Err(RegistryError::Disconnected)
             }
 
             self.tick()?;
         }
     }
 
-    fn tick(&mut self) -> Result<(), ProcessError> {
+    fn tick(&mut self) -> Result<(), RegistryError> {
         let msg = self.rx.recv()?;
         trace!("message received by registry");
         let now = Instant::now();

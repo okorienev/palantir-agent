@@ -8,6 +8,7 @@ use palantir_proto::palantir::request::request::Message as ProtoMessage;
 use palantir_proto::palantir::shared::measurement::Measurement as ProtoMeasurement;
 use std::collections::HashMap;
 use std::time::Instant;
+use crate::metrics::traits::PrometheusMetric;
 
 pub struct HistogramCollection {
     tags: Vec<Tag>,
@@ -50,7 +51,7 @@ impl HistogramCollection {
             self.process_measurement(m.name, m.took_us);
         }
 
-        match duration.checked_sub(total) {
+        match duration.checked_add(total) {
             None => {
                 warn!(
                     "sum of all measurements ({}us) > duration ({}us)",
@@ -81,6 +82,17 @@ impl From<&ProtoMessage> for HistogramCollection {
         match msg {
             ProtoMessage::ApmV1Action(action) => HistogramCollection::from(action),
         }
+    }
+}
+
+impl PrometheusMetric for HistogramCollection {
+    fn serialize_prometheus(&self) -> Vec<String> {
+        let mut result = Vec::new();
+        for histogram in self.metrics.values() {
+            result.extend(histogram.serialize_prometheus())
+        }
+
+        result
     }
 }
 
