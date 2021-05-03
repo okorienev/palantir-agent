@@ -1,6 +1,7 @@
 use crate::constants as c;
 use crate::metrics::histogram::metric::Histogram;
 use crate::metrics::tag::Tag;
+use crate::metrics::traits::PrometheusMetric;
 use crate::util::checksum::Checksum;
 use log::warn;
 use palantir_proto::palantir::apm::v1::action::ApmV1Action;
@@ -8,7 +9,6 @@ use palantir_proto::palantir::request::request::Message as ProtoMessage;
 use palantir_proto::palantir::shared::measurement::Measurement as ProtoMeasurement;
 use std::collections::HashMap;
 use std::time::Instant;
-use crate::metrics::traits::PrometheusMetric;
 
 pub struct HistogramCollection {
     tags: Vec<Tag>,

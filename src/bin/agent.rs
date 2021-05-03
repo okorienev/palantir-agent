@@ -30,7 +30,7 @@ fn main() {
     let listener_handles = server.schedule().unwrap();
 
     let registry_handler = thread::spawn(move || {
-       run_registry(rx);
+        run_registry(rx);
     });
 
     for join_handle in listener_handles {

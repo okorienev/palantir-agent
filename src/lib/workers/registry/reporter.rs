@@ -1,27 +1,26 @@
-use std::sync::mpsc::{Sender, SendError};
+use crate::metrics::histogram::metric::Histogram;
+use crate::metrics::traits::PrometheusMetric;
 use crate::workers::registry::error::RegistryError;
-use log::{error, trace, info};
+use crate::workers::registry::hc::HistogramCollection;
+use hyper::{Body, Chunk};
+use log::{error, info, trace};
+use std::collections::HashMap;
+use std::sync::mpsc::{SendError, Sender};
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
-use std::sync::{Arc, Mutex};
-use std::collections::HashMap;
-use crate::metrics::histogram::metric::Histogram;
-use crate::workers::registry::hc::HistogramCollection;
-use crate::metrics::traits::PrometheusMetric;
-use hyper::{Body, Chunk};
 
 const REPORT_PERIOD_SECONDS: u64 = 10;
 
-
 // TODO make configurable
 // TODO add metrics about report generation time
-// TODO add metrics about victoriametrics response time 
-// TODO add reading shared labels from 
+// TODO add metrics about victoriametrics response time
+// TODO add reading shared labels from
 pub struct Reporter {
     client_metrics: Arc<Mutex<HashMap<u64, HistogramCollection>>>,
     handle_time: Arc<Mutex<Histogram>>,
 
-    keepalive_tx: Sender<()>
+    keepalive_tx: Sender<()>,
 }
 
 impl Reporter {
@@ -30,9 +29,13 @@ impl Reporter {
         handle_time: Arc<Mutex<Histogram>>,
         keepalive_tx: Sender<()>,
     ) -> Self {
-        Self { client_metrics, handle_time, keepalive_tx }
+        Self {
+            client_metrics,
+            handle_time,
+            keepalive_tx,
+        }
     }
-    
+
     pub fn run(&mut self) -> Result<(), RegistryError> {
         loop {
             trace!("Starting report");
@@ -41,7 +44,7 @@ impl Reporter {
             match self.keepalive_tx.send(()) {
                 Err(err) => {
                     error!("Registry disconnected");
-                    return Err(RegistryError::from(err))
+                    return Err(RegistryError::from(err));
                 }
                 Ok(_) => {}
             }
@@ -51,7 +54,7 @@ impl Reporter {
             thread::sleep(Duration::from_secs(REPORT_PERIOD_SECONDS));
         }
     }
-    
+
     pub fn tick(&mut self) -> Result<(), RegistryError> {
         let (mut writer, body) = Body::channel();
 

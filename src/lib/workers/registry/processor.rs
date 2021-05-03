@@ -1,15 +1,15 @@
-use std::sync::{Arc, Mutex, TryLockError, PoisonError};
-use std::collections::HashMap;
-use crate::util::checksum::Checksum;
-use crate::workers::registry::hc::HistogramCollection;
 use crate::metrics::histogram::metric::Histogram;
-use std::sync::mpsc::{Receiver, TryRecvError, RecvError};
-use palantir_proto::palantir::request::request::Message as ProtoMessage;
-use std::error::Error;
-use std::time::Instant;
-use log::{error, trace};
-use std::any::Any;
+use crate::util::checksum::Checksum;
 use crate::workers::registry::error::RegistryError;
+use crate::workers::registry::hc::HistogramCollection;
+use log::{error, trace};
+use palantir_proto::palantir::request::request::Message as ProtoMessage;
+use std::any::Any;
+use std::collections::HashMap;
+use std::error::Error;
+use std::sync::mpsc::{Receiver, RecvError, TryRecvError};
+use std::sync::{Arc, Mutex, PoisonError, TryLockError};
+use std::time::Instant;
 
 pub struct Processor {
     rx: Receiver<ProtoMessage>,
@@ -26,15 +26,20 @@ impl Processor {
         handle_time: Arc<Mutex<Histogram>>,
         keepalive_reporter: Receiver<()>,
     ) -> Self {
-        Self {rx, client_metrics, handle_time, keepalive_reporter}
+        Self {
+            rx,
+            client_metrics,
+            handle_time,
+            keepalive_reporter,
+        }
     }
 
-    pub fn run(&mut self) -> Result<(), RegistryError<>> {
+    pub fn run(&mut self) -> Result<(), RegistryError> {
         loop {
             let reporter_alive = self.keepalive_reporter.try_recv();
             if let Err(TryRecvError::Disconnected) = reporter_alive {
                 error!("Reporter panicked, exiting");
-                return Err(RegistryError::Disconnected)
+                return Err(RegistryError::Disconnected);
             }
 
             self.tick()?;
@@ -61,4 +66,3 @@ impl Processor {
         return Ok(());
     }
 }
-    

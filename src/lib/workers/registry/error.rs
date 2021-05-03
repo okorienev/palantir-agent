@@ -1,5 +1,5 @@
-use std::sync::PoisonError;
 use std::sync::mpsc::{RecvError, SendError};
+use std::sync::PoisonError;
 
 pub enum RegistryError {
     Disconnected,
@@ -8,13 +8,13 @@ pub enum RegistryError {
 
 impl From<PoisonError<()>> for RegistryError {
     fn from(_: PoisonError<()>) -> Self {
-        return Self::LockPoisoned
+        return Self::LockPoisoned;
     }
 }
 
 impl From<RecvError> for RegistryError {
     fn from(_: RecvError) -> Self {
-        return Self::Disconnected
+        return Self::Disconnected;
     }
 }
 
