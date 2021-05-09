@@ -3,6 +3,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Config {
     pub listeners: Vec<ListenerType>,
+    pub reporter: ReporterConfig,
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+pub struct ReporterConfig {
+    pub vm_import_url: String,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]

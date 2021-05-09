@@ -989,6 +989,7 @@ dependencies = [
  "criterion",
  "hyper 0.12.36",
  "itertools 0.10.0",
+ "lazy_static",
  "log",
  "palantir-proto",
  "rand",

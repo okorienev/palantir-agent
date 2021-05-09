@@ -1,3 +1,4 @@
+use crate::config::defs::ReporterConfig;
 use crate::metrics::histogram::metric::Histogram;
 use crate::workers::registry::hc::HistogramCollection;
 use crate::workers::registry::processor::Processor;
@@ -10,7 +11,10 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
-pub fn run_registry(rx: Receiver<ProtoMessage>) -> thread::Result<()> {
+pub fn run_registry(
+    rx: Receiver<ProtoMessage>,
+    reporter: &'static ReporterConfig,
+) -> thread::Result<()> {
     let client_metrics: Arc<Mutex<HashMap<u64, HistogramCollection>>> =
         Arc::new(Mutex::new(HashMap::new()));
     let handle_time: Arc<Mutex<Histogram>> = Arc::new(Mutex::new(Histogram::new(
@@ -30,7 +34,12 @@ pub fn run_registry(rx: Receiver<ProtoMessage>) -> thread::Result<()> {
     let metrics_clone = client_metrics.clone();
     let handle_clone = handle_time.clone();
     let reporter_handle = thread::spawn(move || {
-        let mut reporter = Reporter::new(metrics_clone, handle_clone, reporter_tx);
+        let mut reporter = Reporter::new(
+            metrics_clone,
+            handle_clone,
+            reporter_tx,
+            &reporter.vm_import_url,
+        );
         reporter.run();
     });
 

@@ -37,7 +37,7 @@ fn parse_config<T: AsRef<str>>(raw_config: T) -> Result<Config, ConfigurationErr
 
 #[cfg(test)]
 mod tests {
-    use crate::config::defs::{Config, ListenerType, TCPConfig, UDPConfig};
+    use crate::config::defs::{Config, ListenerType, ReporterConfig, TCPConfig, UDPConfig};
     use crate::config::parser::{parse_config, ConfigurationError};
 
     #[test]
@@ -67,6 +67,9 @@ mod tests {
                     buffer_size: 4096,
                 }),
             ],
+            reporter: ReporterConfig {
+                vm_import_url: "some".to_string(),
+            },
         };
         let yaml = "
 ---
@@ -76,6 +79,8 @@ listeners:
       buffer_size: 4096
   - TCP:
       port: 2747
+reporter:
+  vm_import_url: some
         ";
         let result = parse_config(yaml).ok().unwrap();
 

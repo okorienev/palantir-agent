@@ -8,19 +8,19 @@ use std::thread::JoinHandle;
 
 mod listeners;
 
-pub struct Server {
-    listeners: Vec<ListenerType>,
+pub struct Server<'a> {
+    listeners: &'a Vec<ListenerType>,
     tx: Sender<ProtoMessage>,
 }
 
-impl Server {
-    pub fn new(listeners: Vec<ListenerType>, tx: Sender<ProtoMessage>) -> Self {
+impl Server<'_> {
+    pub fn new(listeners: &'static Vec<ListenerType>, tx: Sender<ProtoMessage>) -> Self {
         return Self { listeners, tx };
     }
 
     pub fn schedule(&self) -> IOResult<Vec<JoinHandle<()>>> {
         let mut threads = Vec::new();
-        for config in &self.listeners {
+        for config in self.listeners {
             match config {
                 ListenerType::UDP(udp_config) => {
                     let listener = UDPListener::new(udp_config, self.tx.clone())?;
