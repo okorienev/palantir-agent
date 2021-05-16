@@ -1,16 +1,39 @@
+use crate::constants as c;
 use crate::metrics::histogram::metric::Histogram;
 use crate::metrics::traits::PrometheusMetric;
 use crate::workers::registry::error::RegistryError;
 use crate::workers::registry::hc::HistogramCollection;
 use hyper::{Body, Client, Request};
-use log::{error, info, trace};
+use lazy_static::lazy_static;
+use log::{error, info, trace, warn};
 use std::collections::HashMap;
 use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
+use url::Url;
 
 const REPORT_PERIOD_SECONDS: u64 = 10;
+
+lazy_static! {
+    static ref ADDITIONAL_LABELS: Vec<(String, String)> = {
+        let mut labels = Vec::new();
+        for (key, value) in std::env::vars() {
+            if !key.starts_with(c::EXTRA_LABEL_PREFIX) {
+                trace!("key {} omitted", key);
+                continue;
+            }
+            if !c::EXTRA_LABEL_REGEX.is_match(&key) || !c::EXTRA_LABEL_REGEX.is_match(&value) {
+                warn!("pair {}:{} is invalid", key, value);
+                continue;
+            }
+            let label_name = key.replace(c::EXTRA_LABEL_PREFIX, "").to_lowercase();
+            trace!("adding extra label {}:{}", label_name, value);
+            labels.push((label_name, value));
+        }
+        labels
+    };
+}
 
 // TODO make configurable
 // TODO add metrics about report generation time
@@ -79,6 +102,12 @@ impl Reporter<'_> {
         std::mem::drop(locked);
 
         let client = Client::new();
+        // this is not recoverable - no sense in working if there is nowhere to report
+        // also config validation should check that url is OK
+        let mut url = Url::parse(self.vm_import_url).unwrap();
+        for (key, value) in ADDITIONAL_LABELS.iter() {
+            url.query_pairs_mut().append_pair(key, value);
+        }
         let req = Request::post(self.vm_import_url).body(Body::from(report));
 
         match req {

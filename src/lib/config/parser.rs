@@ -3,6 +3,7 @@ use super::validator::run_validation_chain;
 use serde_yaml;
 use serde_yaml::Error;
 use std::convert::From;
+use url::ParseError;
 
 #[derive(Debug)]
 pub enum ConfigurationError {
@@ -26,6 +27,13 @@ impl From<serde_yaml::Error> for ConfigurationError {
 pub enum LogicError {
     PortUsedTwice(u16),
     AtLeastOneListener,
+    InvalidUri(ParseError),
+}
+
+impl From<ParseError> for LogicError {
+    fn from(err: ParseError) -> Self {
+        Self::InvalidUri(err)
+    }
 }
 
 #[allow(dead_code)]
@@ -69,7 +77,7 @@ mod tests {
                 }),
             ],
             reporter: ReporterConfig {
-                vm_import_url: "some".to_string(),
+                vm_import_url: "http://localhost:8428/api".to_string(),
             },
         };
         let yaml = "
@@ -81,7 +89,7 @@ listeners:
   - TCP:
       port: 2747
 reporter:
-  vm_import_url: some
+  vm_import_url: http://localhost:8428/api
         ";
         let result = parse_config(yaml).ok().unwrap();
 
