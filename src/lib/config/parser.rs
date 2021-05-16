@@ -28,6 +28,7 @@ pub enum LogicError {
     AtLeastOneListener,
 }
 
+#[allow(dead_code)]
 fn parse_config<T: AsRef<str>>(raw_config: T) -> Result<Config, ConfigurationError> {
     let config: Config = serde_yaml::from_str(raw_config.as_ref())?;
     run_validation_chain(&config)?;

@@ -37,11 +37,20 @@ fn main() {
     let listener_handles = server.schedule().unwrap();
 
     let registry_handler = thread::spawn(move || {
-        run_registry(rx, &CONFIG.reporter);
+        #[allow(unused_must_use)]
+        {
+            run_registry(rx, &CONFIG.reporter);
+        }
     });
 
     for join_handle in listener_handles {
-        join_handle.join();
+        #[allow(unused_must_use)]
+        {
+            join_handle.join();
+        }
     }
-    registry_handler.join();
+    #[allow(unused_must_use)]
+    {
+        registry_handler.join();
+    }
 }

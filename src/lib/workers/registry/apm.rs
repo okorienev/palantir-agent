@@ -3,13 +3,11 @@ use crate::metrics::histogram::metric::Histogram;
 use crate::workers::registry::hc::HistogramCollection;
 use crate::workers::registry::processor::Processor;
 use crate::workers::registry::reporter::Reporter;
-use log::{error, trace};
 use palantir_proto::palantir::request::request::Message as ProtoMessage;
 use std::collections::HashMap;
 use std::sync::mpsc::{channel, Receiver};
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::time::{Duration, Instant};
 
 pub fn run_registry(
     rx: Receiver<ProtoMessage>,
@@ -28,13 +26,16 @@ pub fn run_registry(
     let handle_clone = handle_time.clone();
     let processor_handle = thread::spawn(move || {
         let mut processor = Processor::new(rx, metrics_clone, handle_clone, reporter_rx);
-        processor.run();
+        #[allow(unused_must_use)]
+        {
+            processor.run();
+        }
     });
 
     let metrics_clone = client_metrics.clone();
     let handle_clone = handle_time.clone();
     let reporter_handle = thread::spawn(move || {
-        let mut runtime = tokio::runtime::Builder::new_current_thread()
+        let runtime = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
             .expect("Unable to create runtime");
@@ -45,7 +46,10 @@ pub fn run_registry(
             reporter_tx,
             &reporter.vm_import_url,
         );
-        runtime.block_on(reporter.run());
+        #[allow(unused_must_use)]
+        {
+            runtime.block_on(reporter.run());
+        }
     });
 
     processor_handle.join()?;

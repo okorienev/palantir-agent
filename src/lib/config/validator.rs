@@ -34,6 +34,7 @@ fn listeners_at_least_one(listeners_config: &Vec<ListenerType>) -> Result<(), Lo
     Ok(())
 }
 
+#[allow(dead_code)]
 pub fn run_validation_chain(config: &Config) -> Result<(), LogicError> {
     listeners_at_least_one(&config.listeners)?;
     listeners_no_same_ports(&config.listeners)?;
@@ -114,6 +115,6 @@ mod tests {
             },
         };
 
-        let result = run_validation_chain(&config).ok().unwrap();
+        let _result = run_validation_chain(&config).ok().unwrap();
     }
 }

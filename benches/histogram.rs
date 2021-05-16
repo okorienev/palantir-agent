@@ -1,11 +1,11 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use palantir_agent_lib::metrics::histogram::builder::HistogramBuilder;
 use palantir_agent_lib::metrics::traits::PrometheusMetric;
 use rand::RngCore;
 
 pub fn bench_track_random(c: &mut Criterion) {
     let mut rng = rand::thread_rng();
-    let mut val = rng.next_u32();
+    let val = rng.next_u32();
     let mut histogram = HistogramBuilder::named("some").finish();
     c.bench_function("Track random u32", |b| {
         b.iter(|| histogram.track(val as u64))
@@ -13,14 +13,14 @@ pub fn bench_track_random(c: &mut Criterion) {
 }
 
 pub fn bench_serialize_empty(c: &mut Criterion) {
-    let mut histogram = HistogramBuilder::named("some").finish();
+    let histogram = HistogramBuilder::named("some").finish();
     c.bench_function("Serialize empty", |b| {
         b.iter(|| histogram.serialize_prometheus())
     });
 }
 
 pub fn bench_serialize_empty_10_tags(c: &mut Criterion) {
-    let mut histogram = HistogramBuilder::named("some")
+    let histogram = HistogramBuilder::named("some")
         .tag("key1", "val1")
         .tag("key2", "val2")
         .tag("key3", "val3")

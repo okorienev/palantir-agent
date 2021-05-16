@@ -4,11 +4,11 @@ use crate::workers::registry::error::RegistryError;
 use crate::workers::registry::hc::HistogramCollection;
 use log::{error, trace};
 use palantir_proto::palantir::request::request::Message as ProtoMessage;
-use std::any::Any;
+
 use std::collections::HashMap;
-use std::error::Error;
-use std::sync::mpsc::{Receiver, RecvError, TryRecvError};
-use std::sync::{Arc, Mutex, PoisonError, TryLockError};
+
+use std::sync::mpsc::{Receiver, TryRecvError};
+use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
 pub struct Processor {

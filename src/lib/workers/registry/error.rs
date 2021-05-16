@@ -1,6 +1,7 @@
 use std::sync::mpsc::{RecvError, SendError};
 use std::sync::PoisonError;
 
+#[derive(Debug)]
 pub enum RegistryError {
     Disconnected,
     LockPoisoned,
