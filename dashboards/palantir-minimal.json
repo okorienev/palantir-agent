@@ -180,11 +180,30 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "prometheus_buckets(\n    sum(rate(\n        request_handle_time_bucket\n    )) by (vmrange)\n)",
+          "expr": "histogram_quantile(0.5, sum by (le)(irate(prometheus_buckets(request_handle_time_bucket[1m]))))",
           "instant": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "50 percentile",
           "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.9, sum by (le)(irate(prometheus_buckets(request_handle_time_bucket[1m]))))",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "90 percentile",
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum by (le)(irate(prometheus_buckets(request_handle_time_bucket[1m]))))",
+          "interval": "",
+          "legendFormat": "99 percentile",
+          "refId": "C"
+        },
+        {
+          "expr": "sum(rate(request_handle_time_sum[1m])) / sum(rate(request_handle_time_count[1m]))",
+          "interval": "",
+          "legendFormat": "avg",
+          "refId": "D"
         }
       ],
       "thresholds": [],
@@ -236,12 +255,12 @@
     "list": []
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Palantir",
   "uid": "A4iMSCjMz",
-  "version": 2
+  "version": 4
 }
