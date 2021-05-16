@@ -265,8 +265,8 @@ mod tests {
         let res = histogram.serialize_prometheus();
 
         assert_eq!(res.len(), 2);
-        assert_eq!(res[0], String::from("hist_count{generation=\"1\"} 0"));
-        assert_eq!(res[1], String::from("hist_sum{generation=\"1\"} 0"));
+        assert_eq!(res[0], String::from("hist_count{generation=\"1\"} 0\n"));
+        assert_eq!(res[1], String::from("hist_sum{generation=\"1\"} 0\n"));
     }
 
     #[test]
@@ -281,18 +281,18 @@ mod tests {
         assert_eq!(res.len(), 5);
         assert_eq!(
             res[0],
-            String::from("hist_bucket{generation=\"1\",vmrange=\"0...255\"} 1")
+            String::from("hist_bucket{generation=\"1\",vmrange=\"0...255\"} 1\n")
         );
         assert_eq!(
             res[1],
-            String::from("hist_bucket{generation=\"1\",vmrange=\"256...511\"} 256")
+            String::from("hist_bucket{generation=\"1\",vmrange=\"256...511\"} 256\n")
         );
         assert_eq!(
             res[2],
-            String::from("hist_bucket{generation=\"1\",vmrange=\"512...1023\"} 512")
+            String::from("hist_bucket{generation=\"1\",vmrange=\"512...1023\"} 512\n")
         );
-        assert_eq!(res[3], String::from("hist_count{generation=\"1\"} 3"));
-        assert_eq!(res[4], String::from("hist_sum{generation=\"1\"} 769"));
+        assert_eq!(res[3], String::from("hist_count{generation=\"1\"} 3\n"));
+        assert_eq!(res[4], String::from("hist_sum{generation=\"1\"} 769\n"));
     }
 
     #[test]
@@ -312,15 +312,15 @@ mod tests {
         assert_eq!(res.len(), 3);
         assert_eq!(
             res[0],
-            String::from("hist_bucket{generation=\"1\",key=\"value\",vmrange=\"0...255\"} 1")
+            String::from("hist_bucket{generation=\"1\",key=\"value\",vmrange=\"0...255\"} 1\n")
         );
         assert_eq!(
             res[1],
-            String::from("hist_count{generation=\"1\",key=\"value\"} 1")
+            String::from("hist_count{generation=\"1\",key=\"value\"} 1\n")
         );
         assert_eq!(
             res[2],
-            String::from("hist_sum{generation=\"1\",key=\"value\"} 1")
+            String::from("hist_sum{generation=\"1\",key=\"value\"} 1\n")
         );
     }
 }
