@@ -1,0 +1,34 @@
+version: "3.6"
+
+services:
+  vm:
+    container_name: "victoriametrics"
+    image: victoriametrics/victoria-metrics
+    ports:
+      - "8428:8428"
+    volumes:
+      - type: bind
+        source: ".volumes/victoriametrics"
+        target: "/etc/victoriametrics"
+    networks:
+      - main
+    command:
+      - "--httpListenAddr=:8428"
+      - "storageDataPath=/etc/victoriametrics"
+
+  grafana:
+    container_name: "grafana"
+    user: "0"
+    image: "grafana/grafana:7.2.1"
+    ports:
+      - "3000:3000"
+    volumes:
+      - type: bind
+        source: ".volumes/grafana"
+        target: "/var/lib/grafana"
+    networks:
+      - main
+
+networks:
+  main:
+    driver: bridge
