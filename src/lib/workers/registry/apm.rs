@@ -34,13 +34,18 @@ pub fn run_registry(
     let metrics_clone = client_metrics.clone();
     let handle_clone = handle_time.clone();
     let reporter_handle = thread::spawn(move || {
+        let mut runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .expect("Unable to create runtime");
+
         let mut reporter = Reporter::new(
             metrics_clone,
             handle_clone,
             reporter_tx,
             &reporter.vm_import_url,
         );
-        reporter.run();
+        runtime.block_on(reporter.run());
     });
 
     processor_handle.join()?;

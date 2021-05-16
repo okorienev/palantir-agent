@@ -2,12 +2,10 @@ use crate::metrics::histogram::metric::Histogram;
 use crate::metrics::traits::PrometheusMetric;
 use crate::workers::registry::error::RegistryError;
 use crate::workers::registry::hc::HistogramCollection;
-use hyper::http::Error;
-use hyper::rt::Future;
-use hyper::{Body, Chunk, Client, Request, Response};
+use hyper::{Body, Client, Request};
 use log::{error, info, trace};
 use std::collections::HashMap;
-use std::sync::mpsc::{SendError, Sender};
+use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -42,7 +40,7 @@ impl Reporter<'_> {
         }
     }
 
-    pub fn run(&mut self) -> Result<(), RegistryError> {
+    pub async fn run(&mut self) -> Result<(), RegistryError> {
         loop {
             trace!("Starting report");
             let start = Instant::now();
@@ -55,37 +53,37 @@ impl Reporter<'_> {
                 Ok(_) => {}
             }
 
-            self.tick()?;
+            self.tick().await?;
             info!("Report took {}ms", start.elapsed().as_millis());
             thread::sleep(Duration::from_secs(REPORT_PERIOD_SECONDS));
         }
     }
 
-    pub fn tick(&mut self) -> Result<(), RegistryError> {
-        let (mut writer, body) = Body::channel();
-
+    async fn tick(&mut self) -> Result<(), RegistryError> {
+        // todo this is very very bad (tons of allocations)
+        // maybe write all the data to the tempfile and then use it as request body?
+        // or integrate hyper::body::Body::channel normally?
+        let mut report = String::new();
         let locked = self.handle_time.lock().unwrap();
         for row in locked.serialize_prometheus() {
-            writer.send_data(Chunk::from(row));
-            writer.send_data(Chunk::from("\n"));
+            report.push_str(&row);
         }
         std::mem::drop(locked);
 
         let locked = self.client_metrics.lock().unwrap();
         for hc in locked.values() {
             for row in hc.serialize_prometheus() {
-                writer.send_data(Chunk::from(row));
-                writer.send_data(Chunk::from("\n"));
+                report.push_str(&row);
             }
         }
         std::mem::drop(locked);
 
         let client = Client::new();
-        let req = Request::post(self.vm_import_url).body(body);
+        let req = Request::post(self.vm_import_url).body(Body::from(report));
 
         match req {
             Ok(request) => {
-                let response = client.request(request).wait();
+                let response = client.request(request).await;
                 match response {
                     Ok(result) => {
                         info!("got {} from vm", result.status().as_u16())

@@ -143,8 +143,8 @@ impl PrometheusMetric for Histogram {
                     &get_vmrange(bucket_no),
                     *bucket
                 ));
+                line.push('\n');
 
-                line.shrink_to_fit();
                 result.push(line)
             }
         }
@@ -153,17 +153,16 @@ impl PrometheusMetric for Histogram {
         count.push_str(&format!("{}_count", &self.name));
         count.push_str(&common_tags);
         count.push_str(&format!("}} {}", self.count));
-        count.shrink_to_fit();
+        count.push('\n');
         result.push(count);
 
         let mut sum = String::with_capacity(256);
         sum.push_str(&format!("{}_sum", &self.name));
         sum.push_str(&common_tags);
         sum.push_str(&format!("}} {}", self.sum));
-        sum.shrink_to_fit();
+        sum.push('\n');
         result.push(sum);
 
-        result.shrink_to_fit();
         result
     }
 }
